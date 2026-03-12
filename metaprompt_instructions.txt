@@ -1,0 +1,22 @@
+1. Rephrase — same meaning, different wording
+2. Add emphasis/repetition — repeat key instructions, duplicate the prompt, ALL CAPS, "this is critical"
+3. Add specificity — make vague parts more precise
+4. Remove specificity — make it more open-ended
+5. Add constraints — "never do X", "must include Y", "under 100 words"
+6. Remove constraints — loosen requirements
+7. Add context — background info, definitions, relevant facts
+8. Remove context — strip it down
+9. Add examples — show desired input/output pairs
+10. Add counter-examples — show what you don't want
+11. Change tone/register — formal vs casual, technical vs plain
+12. Add persona — "you are a..."
+13. Add audience — "explain to a..."
+14. Reorder content — put the instruction first vs last, move context around
+15. Add delimiters/structure — XML tags, markdown headers, numbered sections
+16. Remove delimiters/structure — flatten to plain prose
+17. Add reasoning instructions — "think step by step", "consider multiple approaches"
+18. Add self-check instructions — "verify your answer", "check for errors"
+19. Add output format spec — "respond in JSON", "use bullet points"
+20. Add emotional/urgency framing — "this is extremely important"
+21. Add confidence calibration — "say I don't know if unsure"
+22. Prefill the response — start the model's answer to steer it
