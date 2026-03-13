@@ -316,21 +316,18 @@ prompt_evolver/
 
 ### Installation
 ```bash
-cd /Users/omar.claflin/AITutor/deep-eval/evals
 source .venv/bin/activate
 pip install scikit-learn numpy
 ```
 
 ### Run Tests
 ```bash
-cd /Users/omar.claflin/AITutor/deep-eval
 source evals/.venv/bin/activate
 PYTHONPATH=$PWD:$PYTHONPATH python -m pytest prompt_evolver/tests/ -v
 ```
 
 ### Run Example
 ```bash
-cd /Users/omar.claflin/AITutor/deep-eval
 source evals/.venv/bin/activate
 PYTHONPATH=$PWD:$PYTHONPATH python prompt_evolver/example_usage.py
 ```

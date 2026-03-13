@@ -14,7 +14,6 @@ Prompt Evolver systematically optimizes LLM prompts by:
 ## Installation
 
 ```bash
-cd /Users/omar.claflin/AITutor/deep-eval/evals
 source .venv/bin/activate
 pip install scikit-learn numpy
 ```
@@ -302,7 +301,7 @@ prompt_evolver/
 Run the test suite:
 
 ```bash
-cd /Users/omar.claflin/AITutor/deep-eval
+cd /AITutor/deep-eval
 source evals/.venv/bin/activate
 PYTHONPATH=$PWD:$PYTHONPATH python -m pytest prompt_evolver/tests/ -v
 ```

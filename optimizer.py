@@ -375,7 +375,8 @@ def run_optimization(
         )
 
         population_scores = []
-        for prompt_candidate in population.prompts:
+        n_prompts = len(population.prompts)
+        for i, prompt_candidate in enumerate(population.prompts):
             result = evaluate_prompt(
                 prompt_candidate.full_text,
                 eval_scenarios,
@@ -384,6 +385,7 @@ def run_optimization(
                 baseline_score=baseline_score
             )
             population_scores.append(result.mean_score)
+            print(f"  [{i+1}/{n_prompts}] {prompt_candidate.prompt_id}: {result.mean_score:.4f}", flush=True)
 
         print(f"Mean population score: {sum(population_scores) / len(population_scores):.4f}")
         print(f"Best population score: {max(population_scores):.4f}")

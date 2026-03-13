@@ -29,8 +29,13 @@ class MutationRequest:
 
 
 def normalize_name(name: str) -> str:
-    """Normalize component/eval name for matching (lowercase, remove _/-)."""
-    return re.sub(r'[_\-]', '', name.lower())
+    """Normalize component/eval name for matching.
+
+    Strips brackets and their contents (e.g. [GEval]), then removes
+    underscores, hyphens, and spaces, and lowercases.
+    """
+    name = re.sub(r'\[.*?\]', '', name)
+    return re.sub(r'[_\-\s]', '', name.strip().lower())
 
 
 def find_component_eval_mappings(
