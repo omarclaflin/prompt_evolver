@@ -78,21 +78,14 @@ def build_population(
                 component_versions[comp_name] = selected.version_id
                 version_indicators[selected.version_id] = 1
 
-        # Reassemble full prompt
-        # Build components dict with selected versions
-        components_for_reassembly = OrderedDict()
+        # Reassemble full prompt (start with all components, override optimized ones)
+        components_for_reassembly = OrderedDict(baseline_components)
         for comp_name in component_names:
             version_id = component_versions.get(comp_name)
             if version_id:
-                # Find the version text
                 version_record = next((v for v in version_pool if v.version_id == version_id), None)
                 if version_record:
                     components_for_reassembly[comp_name] = version_record.text
-                else:
-                    # Fallback to baseline
-                    components_for_reassembly[comp_name] = baseline_components[comp_name]
-            else:
-                components_for_reassembly[comp_name] = baseline_components[comp_name]
 
         full_text = reassemble(preamble, components_for_reassembly)
 

@@ -488,8 +488,8 @@ def run_optimization(
         print(f"\nBest population prompt: {best_population_prompt.prompt_id}")
         print(f"  Score: {best_population_score:.4f}")
 
-        # Best from regression (assemble from best versions)
-        best_components = OrderedDict()
+        # Best from regression (start with all components, override optimized ones)
+        best_components = OrderedDict(baseline_components)
         for comp_name in component_names:
             versions = get_versions_by_component(state.version_pool, comp_name)
             best_version = max(versions, key=lambda v: v.coefficient or 0.0)
