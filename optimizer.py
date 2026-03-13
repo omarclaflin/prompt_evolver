@@ -381,13 +381,7 @@ def run_optimization(
         print(f"\nBuilt population of {len(population.prompts)} prompts")
         print("Evaluating population...")
 
-        # Subsample scenarios for this evaluation (50% per category)
-        eval_scenarios = subsample_scenarios(
-            scenario_split.evaluation_scenarios,
-            subsample_fraction=0.5,
-            per_iteration=True,
-            random_seed=42 + iter_num
-        )
+        eval_scenarios = scenario_split.evaluation_scenarios
 
         population_scores = []
         n_prompts = len(population.prompts)
