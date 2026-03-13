@@ -197,7 +197,13 @@ Return only the new section text, no explanations."""
         max_tokens=2000
     )
 
-    return response.choices[0].message.content.strip()
+    result = response.choices[0].message.content.strip()
+
+    tag = f"<!-- @component: {request.component_name} -->"
+    if tag not in result:
+        result = tag + "\n" + result
+
+    return result
 
 
 def load_meta_prompts(path: Path) -> List[str]:
