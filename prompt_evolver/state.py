@@ -38,6 +38,8 @@ class OptimizerState:
     iteration_history: List[IterationState]
     meta_prompt_weights: Dict[str, float]
     lambda_decay: float = 0.5
+    global_best_prompt: Optional[str] = None
+    global_best_score: float = -1.0
 
 
 def load_state(path: Path) -> Optional[OptimizerState]:
@@ -57,7 +59,9 @@ def load_state(path: Path) -> Optional[OptimizerState]:
         version_pool=version_pool,
         iteration_history=iteration_history,
         meta_prompt_weights=data['meta_prompt_weights'],
-        lambda_decay=data.get('lambda_decay', 0.5)
+        lambda_decay=data.get('lambda_decay', 0.5),
+        global_best_prompt=data.get('global_best_prompt'),
+        global_best_score=data.get('global_best_score', -1.0)
     )
 
 
@@ -70,7 +74,9 @@ def save_state(state: OptimizerState, path: Path) -> None:
         'version_pool': [asdict(v) for v in state.version_pool],
         'iteration_history': [asdict(h) for h in state.iteration_history],
         'meta_prompt_weights': state.meta_prompt_weights,
-        'lambda_decay': state.lambda_decay
+        'lambda_decay': state.lambda_decay,
+        'global_best_prompt': state.global_best_prompt,
+        'global_best_score': state.global_best_score,
     }
 
     with open(path, 'w') as f:

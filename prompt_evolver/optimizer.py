@@ -220,6 +220,10 @@ def run_optimization(
             if version.meta_prompt_used:
                 used_combinations.add((version.meta_prompt_used, version.component_name))
 
+    # Track global best across all iterations (restore from state if resuming)
+    global_best_prompt = state.global_best_prompt
+    global_best_score = state.global_best_score
+
     # Main optimization loop
     for iter_num in range(state.current_iteration, iterations):
         print("\n" + "=" * 70)
@@ -280,10 +284,10 @@ def run_optimization(
             if n_versions == 0:
                 continue
 
-            # Get current text (latest version or baseline)
+            # Seed mutation from best surviving version (by coefficient) or baseline
             existing_versions = get_versions_by_component(state.version_pool, comp_name)
             if existing_versions:
-                current_text = existing_versions[-1].text
+                current_text = max(existing_versions, key=lambda v: v.coefficient or 0.0).text
             else:
                 current_text = baseline_components[comp_name]
 
@@ -422,6 +426,20 @@ def run_optimization(
         for comp, gain in sorted(delta_gains.items(), key=lambda x: -x[1]):
             print(f"  {comp}: {gain:.4f}")
 
+        # Prune version pool: keep top 1/3 (min 1) per component
+        pruned_pool = []
+        for comp_name in component_names:
+            versions = get_versions_by_component(state.version_pool, comp_name)
+            versions_sorted = sorted(versions, key=lambda v: v.coefficient or 0.0, reverse=True)
+            keep_count = max(1, len(versions_sorted) // 3)
+            pruned_pool.extend(versions_sorted[:keep_count])
+        # Also keep frozen component baselines
+        frozen_versions = [v for v in state.version_pool if v.component_name not in component_names]
+        pruned_pool.extend(frozen_versions)
+        old_size = len(state.version_pool)
+        state.version_pool = pruned_pool
+        print(f"\nPruned version pool: {old_size} → {len(state.version_pool)} (top 1/3 per component)")
+
         # Meta-prompt regression
         meta_prompt_efficacies = {}
         if use_meta_prompts and meta_prompts:
@@ -510,6 +528,12 @@ def run_optimization(
             best_score = validation_result_reg.mean_score
             print(f"\n→ Selected: Best regression prompt")
 
+        # Update global best
+        if best_score > global_best_score:
+            global_best_prompt = best_prompt
+            global_best_score = best_score
+            print(f"  ★ New global best: {global_best_score:.4f}")
+
         # Save iteration state
         iter_state = IterationState(
             iteration=iter_num + 1,
@@ -522,6 +546,8 @@ def run_optimization(
         )
         state.iteration_history.append(iter_state)
         state.current_iteration = iter_num + 1
+        state.global_best_prompt = global_best_prompt
+        state.global_best_score = global_best_score
 
         # Save state
         save_state(state, state_file)
@@ -541,17 +567,15 @@ def run_optimization(
     print("=" * 70)
 
     if state.iteration_history:
-        final_iter = state.iteration_history[-1]
-        print(f"\nFinal iteration: {final_iter.iteration}")
-        print(f"Baseline score: {final_iter.baseline_score:.4f}")
-        print(f"Final score: {final_iter.best_prompt_score:.4f}")
-        print(f"Improvement: {final_iter.best_prompt_score - final_iter.baseline_score:.4f}")
-
+        print(f"\nBaseline score: {baseline_score:.4f}")
         print(f"\nProgress over iterations:")
-        for i, hist in enumerate(state.iteration_history):
+        for hist in state.iteration_history:
             print(f"  Iteration {hist.iteration}: {hist.best_prompt_score:.4f}")
 
-        return final_iter.best_prompt
+        print(f"\nGlobal best score: {global_best_score:.4f}")
+        print(f"Improvement over baseline: {global_best_score - baseline_score:.4f}")
+
+        return global_best_prompt
     else:
         print("\nNo iterations completed, returning baseline prompt")
         return baseline_prompt

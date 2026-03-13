@@ -13,5 +13,8 @@ dependencies = [
     "numpy>=1.24.0",
 ]
 
+[tool.setuptools.packages.find]
+where = ["."]
+
 [tool.setuptools.package-data]
 prompt_evolver = ["metaprompt_instructions.txt"]
