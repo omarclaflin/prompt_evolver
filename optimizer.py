@@ -52,6 +52,7 @@ def run_optimization(
     use_meta_prompts: bool = False,
     delta_gain_stop: Optional[float] = None,
     state_path: str = "evolver_state.json",
+    optimize_components: Optional[List[str]] = None,
 ) -> str:
     """
     Run component-aware prompt optimization.
@@ -72,6 +73,7 @@ def run_optimization(
         use_meta_prompts: Sample meta-prompts from metaprompt_instructions.txt
         delta_gain_stop: Early stopping threshold for max delta_gain
         state_path: Path to save/load state file
+        optimize_components: List of component names to optimize (None = all)
 
     Returns:
         Optimized prompt string
@@ -82,11 +84,24 @@ def run_optimization(
 
     # Parse components
     preamble, baseline_components = parse_components(prompt)
-    component_names = list(baseline_components.keys())
-    n_components = len(component_names)
+    all_component_names = list(baseline_components.keys())
 
-    print(f"\nParsed {n_components} components: {component_names}")
+    print(f"\nParsed {len(all_component_names)} components: {all_component_names}")
     print(f"Preamble length: {len(preamble)} chars")
+
+    # Filter to only optimized components (others stay frozen at baseline)
+    if optimize_components is not None:
+        unknown = [c for c in optimize_components if c not in all_component_names]
+        if unknown:
+            raise ValueError(f"Unknown component names: {unknown}. Available: {all_component_names}")
+        component_names = [c for c in all_component_names if c in optimize_components]
+        frozen = [c for c in all_component_names if c not in optimize_components]
+        print(f"Optimizing {len(component_names)} components: {component_names}")
+        print(f"Frozen {len(frozen)} components: {frozen}")
+    else:
+        component_names = all_component_names
+
+    n_components = len(component_names)
 
     # Set defaults
     if version_budget is None:

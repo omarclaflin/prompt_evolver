@@ -72,14 +72,14 @@ def stratified_split(
         shuffled = cat_scenarios.copy()
         random.shuffle(shuffled)
 
-        # Determine counts
+        # Determine counts (round up so each category contributes at least 1)
         if isinstance(eval_split, float):
-            eval_count = int(len(cat_scenarios) * eval_split)
+            eval_count = max(1, int(len(cat_scenarios) * eval_split + 0.5))
         else:
             eval_count = min(eval_split, len(cat_scenarios))
 
         if isinstance(validation_split, float):
-            val_count = int(len(cat_scenarios) * validation_split)
+            val_count = max(1, int(len(cat_scenarios) * validation_split + 0.5))
         else:
             val_count = min(validation_split, len(cat_scenarios))
 
